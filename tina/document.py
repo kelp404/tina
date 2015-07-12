@@ -90,7 +90,7 @@ class Document(object):
             if not len(ids):
                 return []
 
-            def __get():
+            def __get(ids):
                 return es.mget(
                     index=cls.get_index_name(),
                     doc_type=cls.__name__,
@@ -100,11 +100,11 @@ class Document(object):
                 )
 
             try:
-                response = __get()
+                response = __get(ids)
             except NotFoundError as e:
                 if 'IndexMissingException' in str(e):  # try to create index
                     es.indices.create(index=cls.get_index_name())
-                    response = __get()
+                    response = __get(ids)
                 else:
                     raise e
             result_table = {x['_id']: x for x in response['docs'] if x['found']}
@@ -118,20 +118,19 @@ class Document(object):
             return result
 
         # fetch the document
+        def __get(id):
+            return es.get(
+                index=cls.get_index_name(),
+                doc_type=cls.__name__,
+                id=id,
+            )
         try:
-            def __get():
-                return es.get(
-                    index=cls.get_index_name(),
-                    doc_type=cls.__name__,
-                    id=ids,
-                )
-
             try:
-                response = __get()
+                response = __get(ids)
             except NotFoundError as e:
                 if 'IndexMissingException' in str(e):  # try to create index
                     es.indices.create(index=cls.get_index_name())
-                    response = __get()
+                    response = __get(ids)
                 else:
                     raise e
             result = cls(_id=response['_id'], _version=response['_version'], **response['_source'])
