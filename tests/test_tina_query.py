@@ -83,6 +83,19 @@ class TesttinaQuery(unittest.TestCase):
             version=True,
         )
 
+    def test_tina_query_has_any(self):
+        fake_es = MagicMock()
+        fake_es().search_exists.return_value = {
+            'exists': True,
+        }
+        with patch('tina.document.Document._es', new=fake_es):
+            self.query.document_class.get_index_name = MagicMock(return_value='index_name')
+            self.query.has_any()
+        fake_es.search_exists.assert_called_once_with(
+            index='index_name',
+            body={'query': {'match_all': {}}},
+        )
+
     def test_tina_query_first_none(self):
         self.query.fetch = MagicMock()
         self.query.fetch.return_value = tuple([[], 0])

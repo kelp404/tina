@@ -27,6 +27,17 @@ class TestTinaDocument(unittest.TestCase):
             },
         )
 
+    def test_tina_document_exists(self):
+        with patch('tina.document.utils.get_elasticsearch', new=MagicMock()) as mock_es:
+            from tina.document import Document
+            Document.get_index_name = MagicMock(return_value='index_name')
+            Document.exists('id')
+        mock_es().exists.assert_called_once_with(
+            index='index_name',
+            doc_type='Document',
+            id='id',
+        )
+
     def test_tina_document_where(self):
         from tina.document import Document
         with patch('tina.document.Query', new=MagicMock()) as mock_query:

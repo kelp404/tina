@@ -57,6 +57,15 @@ def get(cls, ids, rev=None, db=None, dynamic_properties=True):
     ])
 ```
 ```python
+def exists(cls, id):
+    """
+    Is the document exists?
+    :param id: {string} The documents' id.
+    :return: {bool}
+    """
+    is_exist = SampleModel.exists('byMQ-ULRSJ291RG_eEwSfQ')
+```
+```python
 def where(cls, *args, **kwargs):
     """
     Intersect the query.
@@ -151,6 +160,13 @@ def fetch(self, limit=1000, skip=0, fetch_reference=True):
         ({list}[{Document}], {int}total)
         The documents.
         The total items.
+    """
+```
+```python
+def has_any(self):
+    """
+    Are there any documents match with the query?
+    :return: {bool}
     """
 ```
 ```python

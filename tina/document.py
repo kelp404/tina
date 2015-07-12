@@ -141,6 +141,15 @@ class Document(object):
             return None
 
     @classmethod
+    def exists(cls, id):
+        es = utils.get_elasticsearch()
+        return es.exists(
+            index=cls.get_index_name(),
+            doc_type=cls.__name__,
+            id=id,
+        )
+
+    @classmethod
     def where(cls, *args, **kwargs):
         """
         Intersect the query.
