@@ -2,6 +2,7 @@
 
 An elasticsearch client on Python 3.4.
 
+![tina](_tina.gif)
 
 
 ##Installation
