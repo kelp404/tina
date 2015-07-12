@@ -1,0 +1,3 @@
+[submodule "submodules/elasticsearch-py"]
+	path = submodules/elasticsearch-py
+	url = git@github.com:kelp404/elasticsearch-py.git

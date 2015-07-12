@@ -1,0 +1,13 @@
+machine:
+    python:
+        version:
+            3.4.1
+
+dependencies:
+    override:
+        - git submodule update --init
+        - pip3 install -r pip_requirements.txt
+
+test:
+    override:
+        - python3 test.py

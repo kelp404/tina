@@ -1,0 +1,8 @@
+# Python
+*.pyc
+
+# PyCharm
+.idea
+
+# osx noise
+.DS_Store
