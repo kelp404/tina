@@ -12,7 +12,7 @@ class PropertyNotExist(Exception):
     pass
 class QuerySyntaxError(Exception):
     """
-    exception raised when asahi query syntax error
+    exception raised when tina query syntax error
     """
     pass
 ConflictError = exceptions.ConflictError
