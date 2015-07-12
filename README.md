@@ -7,7 +7,7 @@ An elasticsearch client on Python 3.4.
 
 ##Installation
 >```bash
-$ git submodule add git@github.com:kelp404/tina.git
+$ git submodule add https://github.com/kelp404/tina.git
 $ git submodule add https://github.com/kelp404/elasticsearch-py.git
 $ pip3 install urllib3
 $ pip3 install certifi
