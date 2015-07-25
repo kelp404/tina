@@ -208,16 +208,10 @@ class Query(object):
         query = self.__compile_queries(self.items)[0]
         if query is None:
             query = {'match_all': {}}
-        try:
-            result = es.search_exists(
-                index=self.document_class.get_index_name(),
-                body={'query': query},
-            )
-            if result['exists']:
-                return True
-        except NotFoundError:
-            return False
-        return False
+        return es.search_exists(
+            index=self.document_class.get_index_name(),
+            body={'query': query},
+        )
 
     def first(self, fetch_reference=True):
         """
