@@ -184,7 +184,7 @@ def count(self):
     """
 ```
 ```python
-def sum(self):
+def sum(self, member):
     """
     Sum the field of documents by the query.
     :param member: {string} The property name of the document.
