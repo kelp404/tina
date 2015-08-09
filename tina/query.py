@@ -263,6 +263,51 @@ class Query(object):
                     raise e
         return count_result['count']
 
+    def sum(self, member):
+        """
+        Sum the field of documents by the query.
+        https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-metrics-sum-aggregation.html
+        :param member: {string} The property name of the document.
+        :return: {int}
+        """
+        if member.split('.', 1)[0] not in self.document_class.get_properties().keys():
+            raise PropertyNotExist('%s not in %s' % (member, self.document_class.__name__))
+        if self.contains_empty:
+            return 0
+
+        query, _ = self.__compile_queries(self.items)
+        es = self.document_class._es
+        if query is None:
+            query = {
+                'match_all': {}
+            }
+
+        def __sum():
+            return es.search(
+                index=self.document_class.get_index_name(),
+                body={
+                    'query': query,
+                    'size': 0,
+                    'aggs': {
+                        'intraday_return': {
+                            'sum': {
+                                'field': member
+                            }
+                        }
+                    }
+                },
+            )
+        try:
+            sum_result = __sum()
+        except NotFoundError as e:
+            if 'IndexMissingException' in str(e):  # try to create index
+                es.indices.create(index=self.document_class.get_index_name())
+                sum_result = __sum()
+            else:
+                raise e
+
+        return sum_result['aggregations']['intraday_return']['value']
+
     def group_by(self, member, limit=10, descending=True):
         """
         Aggregations

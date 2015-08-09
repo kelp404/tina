@@ -184,6 +184,14 @@ def count(self):
     """
 ```
 ```python
+def sum(self):
+    """
+    Sum the field of documents by the query.
+    :param member: {string} The property name of the document.
+    :return: {int}
+    """
+```
+```python
 def group_by(self, member, limit=10, descending=True):
     """
     Aggregations
