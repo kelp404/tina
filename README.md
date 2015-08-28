@@ -16,6 +16,15 @@ $ pip3 install ujson
 
 
 
+##Django settings
+>
+```python
+# settings.py
+ELASTICSEARCH_URL = 'https://username:password@domain.com:9200'
+```
+
+
+
 ##Document
 >
 ```python
