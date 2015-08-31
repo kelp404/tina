@@ -7,7 +7,7 @@ def get_elasticsearch():
     Get the connection for ElasticSearch.
     :return: {Elasticsearch}
     """
-    url = getattr(settings, 'ELASTICSEARCH_URL', 'http://localhost:9200')
+    url = getattr(settings, 'TINA_ELASTICSEARCH_URL', 'http://localhost:9200')
     if url.startswith('https://'):
         import certifi
         return elasticsearch.Elasticsearch(
@@ -23,4 +23,4 @@ def get_index_prefix():
     Get index prefix.
     :return: {string}
     """
-    return getattr(settings, 'TINA_DB_PREFIX', '')
+    return getattr(settings, 'TINA_INDEX_PREFIX', '')
