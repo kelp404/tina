@@ -21,6 +21,7 @@ $ pip3 install ujson
 ```python
 # settings.py
 ELASTICSEARCH_URL = 'https://username:password@domain.com:9200'
+TINA_DB_PREFIX = 'prefix_'  # The prefix of the index name.
 ```
 
 
