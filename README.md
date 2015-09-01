@@ -31,13 +31,26 @@ TINA_INDEX_PREFIX = 'prefix_'  # The prefix of the index name.
 ```python
 # example:
 from tina import db
+from .models import Account
 # define your data model
 class SampleModel(db.Document):
     _index = 'samples'  # You can set index name by this attribute.
+    _settings = {  # You can set index settings by this attribute.
+        'analysis': {
+            'analyzer': {
+                'email_url': {
+                    'type': 'custom',
+                    'tokenizer': 'uax_url_email',
+                }
+            }
+        }
+    }
     name = db.StringProperty()
-    email = db.StringProperty(required=True)
+    email = db.StringProperty(required=True, analyzer='email_url')
     is_vip = db.BooleanProperty(default=False)
     quota = db.FloatProperty(default=0.0)
+    account = db.ReferenceProperty(Account)
+    items = db.ListProperty(default=[], mapping={'value': {'type': 'string'}})
     created_at = db.DateTimeProperty(auto_now=True)
 ```
 
@@ -108,6 +121,12 @@ def all(cls):
 def refresh(cls):
     """
     Explicitly refresh the index, making all operations performed
+    """
+```
+```python
+def update_mapping(cls):
+    """
+    Update the index mapping.
     """
 ```
 ```python

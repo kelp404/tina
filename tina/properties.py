@@ -3,17 +3,25 @@ from .exceptions import BadValueError
 
 
 class Property(object):
-    def __init__(self, default=None, required=False):
+    def __init__(self, default=None, required=False, analyzer=None, mapping=None):
         """
         Init the Property.
         :param default: The default value.
         :param required: {bool} Is this failed required?
+        :param analyzer: {str} The analyzer of this member for elasticsearch mapping.
+        :param mapping: {dic} The mapping of sub-members.
+            'email': {
+                'type': 'string',
+                'analyzer': 'email_url',
+            },
         :return:
         """
         self.document_class = None
         self.name = None
         self.default = default
-        self.required=required
+        self.required = required
+        self.analyzer = analyzer
+        self.mapping = mapping
 
     def __get__(self, document_instance, document_class):
         if document_instance is None:

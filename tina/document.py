@@ -1,14 +1,17 @@
+import time
 from datetime import datetime
 from . import utils
 from .query import Query
-from .properties import Property, StringProperty, IntegerProperty, DateTimeProperty
-from .exceptions import NotFoundError
+from .properties import Property, BooleanProperty, IntegerProperty, FloatProperty,\
+    DateTimeProperty, StringProperty, ReferenceProperty
+from .exceptions import NotFoundError, TransportError
 from .deep_query import update_reference_properties
 
 
 class Document(object):
     """
-    :attribute _index: {string} You can set index of this Document.
+    :attribute _index: {string} You can set index name by this attribute.
+    :attribute _settings: {dict} You can set index settings by this attribute.
     :attribute _id: {string}
     :attribute _version: {int}
     :attribute _document: {dict} {'property_name': (value)}
@@ -72,6 +75,12 @@ class Document(object):
             else:
                 cls._index_name = '%s%s' % (utils.get_index_prefix(), cls.__name__.lower())
         return cls._index_name
+
+    @classmethod
+    def get_index_settings(cls):
+        if not hasattr(cls, '_settings') or not cls._settings:
+            return None
+        return cls._settings
 
     @classmethod
     def get(cls, ids, fetch_reference=True):
@@ -188,6 +197,69 @@ class Document(object):
         `<http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/indices-refresh.html>`_
         """
         cls._es.indices.refresh(index=cls.get_index_name())
+
+    @classmethod
+    def update_mapping(cls):
+        """
+        Update the index mapping.
+        https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-update-settings.html
+        https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-put-mapping.html
+        """
+        try:
+            cls._es.indices.create(index=cls.get_index_name())
+            time.sleep(1)
+        except TransportError as e:
+            if e.status_code != 400:
+                raise e
+
+        # close index
+        cls._es.indices.close(index=cls.get_index_name())
+
+        # put settings
+        if cls.get_index_settings():
+            cls._es.indices.put_settings({
+                'settings': {
+                    'index': cls.get_index_settings(),
+                },
+            }, index=cls.get_index_name())
+
+        # put mapping
+        mapping = {}
+        for name, property in cls.get_properties().items():
+            if name in ['_id', '_version']:
+                continue
+            if property.mapping:
+                mapping[name] = {'properties': property.mapping}
+                continue
+
+            field = {}
+            if property.analyzer:
+                field['analyzer'] = property.analyzer
+            if isinstance(property, BooleanProperty):
+                field['type'] = 'boolean'
+            elif isinstance(property, IntegerProperty):
+                field['type'] = 'long'
+            elif isinstance(property, FloatProperty):
+                field['type'] = 'double'
+            elif isinstance(property, DateTimeProperty):
+                field['type'] = 'date'
+                field['format'] = 'dateOptionalTime'
+            elif isinstance(property, ReferenceProperty):
+                field['type'] = 'string'
+                field['analyzer'] = 'keyword'
+            else:
+                field['type'] = 'string'
+            mapping[name] = field
+        cls._es.indices.put_mapping(
+            cls.__name__,
+            {
+                'properties': mapping,
+            },
+            index=cls.get_index_name()
+        )
+
+        # open index
+        cls._es.indices.open(index=cls.get_index_name())
 
     def save(self, synchronized=False):
         """
