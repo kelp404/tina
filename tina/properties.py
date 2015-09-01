@@ -144,7 +144,7 @@ class ListProperty(Property):
         if not isinstance(value, list):
             raise BadValueError('%s should be list' % self.name)
         if self.item_type:
-            document_instance._document[self.name] = [self.item_type(x) for x in value]
+            document_instance._document[self.name] = [None if x is None else self.item_type(x) for x in value]
         else:
             document_instance._document[self.name] = value
 

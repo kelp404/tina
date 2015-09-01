@@ -3,7 +3,7 @@ from datetime import datetime
 from . import utils
 from .query import Query
 from .properties import Property, BooleanProperty, IntegerProperty, FloatProperty,\
-    DateTimeProperty, StringProperty, ReferenceProperty
+    DateTimeProperty, StringProperty, ReferenceProperty, ListProperty
 from .exceptions import NotFoundError, TransportError
 from .deep_query import update_reference_properties
 
@@ -235,7 +235,10 @@ class Document(object):
             field = {}
             if property.analyzer:
                 field['analyzer'] = property.analyzer
-            if isinstance(property, BooleanProperty):
+
+            if isinstance(property, StringProperty):
+                field['type'] = 'string'
+            elif isinstance(property, BooleanProperty):
                 field['type'] = 'boolean'
             elif isinstance(property, IntegerProperty):
                 field['type'] = 'long'
@@ -247,9 +250,21 @@ class Document(object):
             elif isinstance(property, ReferenceProperty):
                 field['type'] = 'string'
                 field['analyzer'] = 'keyword'
-            else:
-                field['type'] = 'string'
-            mapping[name] = field
+            elif isinstance(property, ListProperty):
+                if property.item_type is str:
+                    field['type'] = 'string'
+                elif property.item_type is bool:
+                    field['type'] = 'boolean'
+                elif property.item_type is int:
+                    field['type'] = 'long'
+                elif property.item_type is float:
+                    field['type'] = 'double'
+                elif property.item_type is datetime:
+                    field['type'] = 'date'
+                    field['format'] = 'dateOptionalTime'
+
+            if field:
+                mapping[name] = field
         cls._es.indices.put_mapping(
             cls.__name__,
             {
