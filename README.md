@@ -329,6 +329,11 @@ $ python3 test.py
 
 
 ##Note
+>The default tokenizer is case-insensitive. If we set the `tokenizer` as `keyword`, it will be case-sensitive.
+If we want the field to be case-insensitive with `keyword`, we need to set the `filter` as `lowercase`.
+
+-
+
 >There are issues about ElasticSearch.  
 If your OS X is 10.9.3, your default Java is 1.6. ElasticSearch 1.2.0 required Java 1.7.
 Run ElasticSearch 1.2.0 on Java 1.6 will pop the message like this:
