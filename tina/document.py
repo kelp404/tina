@@ -99,23 +99,13 @@ class Document(object):
             if not len(ids):
                 return []
 
-            def __get(ids):
-                return es.mget(
-                    index=cls.get_index_name(),
-                    doc_type=cls.__name__,
-                    body={
-                        'ids': list([x for x in set(ids) if x])
-                    },
-                )
-
-            try:
-                response = __get(ids)
-            except NotFoundError as e:
-                if 'IndexMissingException' in str(e):  # try to create index
-                    es.indices.create(index=cls.get_index_name())
-                    response = __get(ids)
-                else:
-                    raise e
+            response = es.mget(
+                index=cls.get_index_name(),
+                doc_type=cls.__name__,
+                body={
+                    'ids': list([x for x in set(ids) if x])
+                },
+            )
             result_table = {x['_id']: x for x in response['docs'] if x['found']}
             result = []
             for document_id in ids:
@@ -127,21 +117,12 @@ class Document(object):
             return result
 
         # fetch the document
-        def __get(id):
-            return es.get(
+        try:
+            response = es.get(
                 index=cls.get_index_name(),
                 doc_type=cls.__name__,
-                id=id,
+                id=ids,
             )
-        try:
-            try:
-                response = __get(ids)
-            except NotFoundError as e:
-                if 'IndexMissingException' in str(e):  # try to create index
-                    es.indices.create(index=cls.get_index_name())
-                    response = __get(ids)
-                else:
-                    raise e
             result = cls(_id=response['_id'], _version=response['_version'], **response['_source'])
             if fetch_reference:
                 update_reference_properties([result])

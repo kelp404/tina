@@ -178,20 +178,11 @@ class Query(object):
             return [], 0
 
         es = self.document_class._es
-        def __search():
-            return es.search(
-                index=self.document_class.get_index_name(),
-                body=self.__generate_elasticsearch_search_body(self.items, limit, skip),
-                version=True
-            )
-        try:
-            search_result = __search()
-        except NotFoundError as e:
-            if 'IndexMissingException' in str(e):  # try to create index
-                es.indices.create(index=self.document_class.get_index_name())
-                search_result = __search()
-            else:
-                raise e
+        search_result = es.search(
+            index=self.document_class.get_index_name(),
+            body=self.__generate_elasticsearch_search_body(self.items, limit, skip),
+            version=True
+        )
 
         result = []
         for hits in search_result['hits']['hits']:
@@ -235,32 +226,14 @@ class Query(object):
         query, _ = self.__compile_queries(self.items)
         es = self.document_class._es
         if query is None:
-            def __count():
-                return es.count(self.document_class.get_index_name())
-            try:
-                count_result = __count()
-            except NotFoundError as e:
-                if 'IndexMissingException' in str(e):  # try to create index
-                    es.indices.create(index=self.document_class.get_index_name())
-                    count_result = __count()
-                else:
-                    raise e
+            count_result = es.count(self.document_class.get_index_name())
         else:
-            def __count():
-                return es.count(
-                    index=self.document_class.get_index_name(),
-                    body={
-                        'query': query
-                    },
-                )
-            try:
-                count_result = __count()
-            except NotFoundError as e:
-                if 'IndexMissingException' in str(e):  # try to create index
-                    es.indices.create(index=self.document_class.get_index_name())
-                    count_result = __count()
-                else:
-                    raise e
+            count_result = es.count(
+                index=self.document_class.get_index_name(),
+                body={
+                    'query': query
+                },
+            )
         return count_result['count']
 
     def sum(self, member):
@@ -282,30 +255,20 @@ class Query(object):
                 'match_all': {}
             }
 
-        def __sum():
-            return es.search(
-                index=self.document_class.get_index_name(),
-                body={
-                    'query': query,
-                    'size': 0,
-                    'aggs': {
-                        'intraday_return': {
-                            'sum': {
-                                'field': member
-                            }
+        sum_result = es.search(
+            index=self.document_class.get_index_name(),
+            body={
+                'query': query,
+                'size': 0,
+                'aggs': {
+                    'intraday_return': {
+                        'sum': {
+                            'field': member
                         }
                     }
-                },
-            )
-        try:
-            sum_result = __sum()
-        except NotFoundError as e:
-            if 'IndexMissingException' in str(e):  # try to create index
-                es.indices.create(index=self.document_class.get_index_name())
-                sum_result = __sum()
-            else:
-                raise e
-
+                }
+            },
+        )
         return sum_result['aggregations']['intraday_return']['value']
 
     def group_by(self, member, limit=10, descending=True):
@@ -343,19 +306,10 @@ class Query(object):
         if es_query:
             query_body['query'] = es_query
 
-        def __search():
-            return es.search(
-                index=self.document_class.get_index_name(),
-                body=query_body,
-            )
-        try:
-            search_result = __search()
-        except NotFoundError as e:
-            if 'IndexMissingException' in str(e):  # try to create index
-                es.indices.create(index=self.document_class.get_index_name())
-                search_result = __search()
-            else:
-                raise e
+        search_result = es.search(
+            index=self.document_class.get_index_name(),
+            body=query_body,
+        )
 
         return search_result['aggregations']['group']['buckets']
 
