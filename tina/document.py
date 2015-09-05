@@ -214,9 +214,6 @@ class Document(object):
                 continue
 
             field = {}
-            if property.analyzer:
-                field['analyzer'] = property.analyzer
-
             if isinstance(property, StringProperty):
                 field['type'] = 'string'
             elif isinstance(property, BooleanProperty):
@@ -243,6 +240,8 @@ class Document(object):
                 elif property.item_type is datetime:
                     field['type'] = 'date'
                     field['format'] = 'dateOptionalTime'
+            if property.analyzer:
+                field['analyzer'] = property.analyzer
 
             if field:
                 mapping[name] = field
