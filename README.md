@@ -1,12 +1,12 @@
-#tina ![circle-ci](https://circleci.com/gh/kelp404/tina.png?circle-token=76f080d70a1b9fdd6e01ff5f55b0acebbf35f5cd)
+# tina [![circle-ci](https://circleci.com/gh/kelp404/tina.png?circle-token=76f080d70a1b9fdd6e01ff5f55b0acebbf35f5cd)](https://circleci.com/gh/kelp404/tina)
 
 An elasticsearch client on Python 3.4.
 
 ![tina](_tina.gif)
 
 
-##Installation
->```bash
+## Installation
+```bash
 $ git submodule add https://github.com/kelp404/tina.git
 $ git submodule add https://github.com/kelp404/elasticsearch-py.git
 $ pip3 install urllib3
@@ -16,8 +16,7 @@ $ pip3 install ujson
 
 
 
-##Django settings
->
+## Django settings
 ```python
 # settings.py
 TINA_ELASTICSEARCH_URL = 'https://username:password@domain.com:9200'
@@ -26,8 +25,7 @@ TINA_INDEX_PREFIX = 'prefix_'  # The prefix of the index name.
 
 
 
-##Document
->
+## Document
 ```python
 # example:
 from tina import db
@@ -55,13 +53,13 @@ class SampleModel(db.Document):
 ```
 
 **Properties**
->```python
+```python
 _id: {string}
 _version: {int}
 ```
 
 **Methods**
->```python
+```python
 def get(cls, ids, rev=None, db=None, dynamic_properties=True):
     """
     Get documents by ids.
@@ -144,11 +142,11 @@ def delete(self, synchronized=False):
 
 
 
-##Query
->The tina query.
+## Query
+The tina query.
 
 **Methods**
->```python
+```python
 def where(self, *args, **kwargs):
     """
     Intersect the query.
@@ -239,8 +237,8 @@ def group_by(self, member, limit=10, descending=True):
 
 
 
-##Examples
->```sql
+## Examples
+```sql
 select * from "ExampleModel" where "name" = "tina"
 ```
 ```python
@@ -248,7 +246,7 @@ models, total = ExampleModel.where('name', equal='tina').fetch()
 ```
 
 ---
->```sql
+```sql
 select * from "ExampleModel" where "name" = "tina" and "email" = "kelp@phate.org"
 ```
 ```python
@@ -258,7 +256,7 @@ models, total = ExampleModel.where('name', equal='tina')\
 ```
 
 ---
->```sql
+```sql
 select * from "ExampleModel" where "name" like "%tina%" or "email" like "%tina%"
 ```
 ```python
@@ -269,7 +267,7 @@ models, total = ExampleModel.where(lambda x:
 ```
 
 ---
->```sql
+```sql
 select * from "ExampleModel" where "category" = 1 or "category" = 3
         order by "created_at" limit 20 offset 20
 ```
@@ -300,7 +298,7 @@ count = ExampleModel.where('age', less=10).count()
 
 
 
-##Properties
+## Properties
 >https://github.com/kelp404/tina/blob/master/tina/properties.py
 + Property
 + StringProperty
@@ -313,26 +311,25 @@ count = ExampleModel.where('age', less=10).count()
 + ReferenceProperty
 
 
-##Requirement
->```bash
+## Requirement
+```bash
 $ git submodule update --init
 $ pip3 install -r pip_requirements.txt
 ```
 
 
 
-##unit-test
->```bash
+## unit-test
+```bash
 $ python3 test.py
 ```
 
 
 
-##Note
+## Note
 >The default tokenizer is case-insensitive. If we set the `tokenizer` as `keyword`, it will be case-sensitive.
 If we want the field to be case-insensitive with `keyword`, we need to set the `filter` as `lowercase`.
 
--
 
 >There are issues about ElasticSearch.  
 If your OS X is 10.9.3, your default Java is 1.6. ElasticSearch 1.2.0 required Java 1.7.
@@ -356,5 +353,5 @@ Could not find the main class: org.elasticsearch.bootstrap.Elasticsearch.  Progr
 
 
 
-##References
+## References
 >+ [elasticsearch-queries](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-queries.html)
