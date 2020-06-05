@@ -5,4 +5,4 @@ ujson==1.33
 
 # unit-test
 mock==1.3.0
-django==1.8.4
+django==1.11.29
