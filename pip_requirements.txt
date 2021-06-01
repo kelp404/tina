@@ -1,5 +1,5 @@
 # elasticsearch-py
-urllib3==1.11
+urllib3==1.26.5
 certifi==2015.04.28
 ujson==1.33
 
