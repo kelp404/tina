@@ -1,7 +1,7 @@
 # elasticsearch-py
 urllib3==1.11
 certifi==2015.04.28
-ujson==1.33
+ujson==5.4.0
 
 # unit-test
 mock==1.3.0
